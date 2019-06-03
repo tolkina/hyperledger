@@ -1,0 +1,7 @@
+django
+django-rest-framework
+pylint
+autopep8
+markdown
+django-filter
+django-cors-headers
