@@ -37,7 +37,7 @@ class ContextSerializer(serializers.HyperlinkedModelSerializer):
         while (
             step is not None and
             step.next_step is not None and
-            step.next_step.started is not None
+            step.next_step.start_date is not None
         ):
             step = step.next_step
 
@@ -50,4 +50,4 @@ class ContextSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Context
-        fields = ('url', 'title', 'initial_step', 'current_step', 'started')
+        fields = ('url', 'title', 'initial_step', 'current_step', 'start_date')

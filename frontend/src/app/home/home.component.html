@@ -1,9 +1,46 @@
-<h1>Home</h1>
-<p>You're logged in with Angular 6 & Basic HTTP Authentication!!</p>
-<div>
-  Users from secure api end point:
-  <ul>
-    <li *ngFor="let user of users">{{user.firstName}} {{user.lastName}}</li>
-  </ul>
+<div *ngFor="let context of contexts">
+  <h1>{{context.title}}</h1>
+  <button *ngIf="!context.start_date" (click)="startContext(context)">Начать процесс</button>
+
+  <div *ngIf="context.initial_step">
+    <table border="1">
+      <tr>
+        <th>Название</th>
+        <th>Статус</th>
+        <th>Начало</th>
+        <th>Необходимо окончить не позднее, чем</th>
+        <th>Условия</th>
+        <th>Исполнитель</th>
+        <th>Ответственный</th>
+      </tr>
+      <tr *ngFor="let step of this.getTable(context)" [attr.id]="step.url == context.current_step ? 'current' : 'not_current'">
+        <td>{{step.title}}</td>
+        <td>
+          <span *ngIf="step.status == 1" style="color: green">Выполнено</span>
+          <span *ngIf="step.status == 21" style="color: red"><b>Текущий</b></span>
+          <span *ngIf="step.status == 20"><b>Текущий</b></span>
+          <span *ngIf="step.status == 31" style="color: red">В ожидании</span>
+          <span *ngIf="step.status == 30" style="color: yellowgreen">В ожидании</span>
+        </td>
+        <td>{{step.start_date}}</td>
+        <td>{{step.end_date}}</td>
+        <td>
+          <ul>
+            <li *ngFor="let requirement of this.getRequirementsForStep(step.url)">{{requirement.name}}
+              <fa-icon *ngIf="requirement.done" [icon]="faCheck"></fa-icon>
+              <div *ngIf="!requirement.done && step.url == context.current_step">
+                <input *ngIf="requirement.type == 'checkbox'" type="checkbox" [disabled]="isDisabledSubmitButton(step)" (click)="accomplishRequirement(requirement)"/>
+                <button *ngIf="requirement.type != 'checkbox'" [disabled]="isDisabledSubmitButton(step)" (click)="accomplishRequirement(requirement)">Выполнить</button>
+              </div>
+
+            </li>
+          </ul>
+        </td>
+        <td>{{this.getUserName(step.executor)}}</td>
+        <td>{{this.getUserName(step.manager)}}</td>
+      </tr>
+    </table>
+  </div>
 </div>
+
 <p><a [routerLink]="['/login']">Logout</a></p>
