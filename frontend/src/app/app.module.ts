@@ -5,7 +5,7 @@ import {AppComponent} from './app.component';
 import {HomeComponent} from './home/home.component';
 import {LoginComponent} from './login/login.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {BasicAuthInterceptor} from './helpers/basic-auth.interceptor';
 import {ErrorInterceptor} from './helpers/error.interceptor';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
@@ -16,7 +16,8 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
     ReactiveFormsModule,
     HttpClientModule,
     AppRoutingModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    FormsModule
   ],
   declarations: [
     AppComponent,

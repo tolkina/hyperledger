@@ -1,46 +1,64 @@
+<nav class="navbar navbar-light">
+  <span></span>
+  <button class="btn btn-link" [routerLink]="['/login']">Выйти</button>
+</nav>
+
+
 <div *ngFor="let context of contexts">
-  <h1>{{context.title}}</h1>
-  <button *ngIf="!context.start_date" (click)="startContext(context)">Начать процесс</button>
+
+  <div id="side_bar" class="clearfix">
+    <h1 style="float: left;">{{context.title}}</h1>
+    <span><button class="btn btn-link" *ngIf="!context.start_date" (click)="startContext(context)" style="position: relative; top: 10px; right: 10px;">Начать процесс</button></span>
+  </div>
 
   <div *ngIf="context.initial_step">
-    <table border="1">
+    <table class="table table-bordered table-hover">
+      <thead>
       <tr>
-        <th>Название</th>
-        <th>Статус</th>
-        <th>Начало</th>
-        <th>Необходимо окончить не позднее, чем</th>
-        <th>Условия</th>
-        <th>Исполнитель</th>
-        <th>Ответственный</th>
+        <th scope="col">Этап</th>
+        <th scope="col">Дата начала</th>
+        <th scope="col">Срок выполнения</th>
+        <th scope="col">Выходные данные</th>
+        <th scope="col">Исполнитель</th>
+        <th scope="col">Ответственный</th>
+        <th scope="col">Статус</th>
       </tr>
-      <tr *ngFor="let step of this.getTable(context)" [attr.id]="step.url == context.current_step ? 'current' : 'not_current'">
-        <td>{{step.title}}</td>
-        <td>
-          <span *ngIf="step.status == 1" style="color: green">Выполнено</span>
-          <span *ngIf="step.status == 21" style="color: red"><b>Текущий</b></span>
-          <span *ngIf="step.status == 20"><b>Текущий</b></span>
-          <span *ngIf="step.status == 31" style="color: red">В ожидании</span>
-          <span *ngIf="step.status == 30" style="color: yellowgreen">В ожидании</span>
-        </td>
+      </thead>
+      <tbody>
+      <tr *ngFor="let step of this.getTable(context)" [className]="getClass(step)">
+        <th scope="row">{{step.title}}</th>
         <td>{{step.start_date}}</td>
         <td>{{step.end_date}}</td>
         <td>
           <ul>
             <li *ngFor="let requirement of this.getRequirementsForStep(step.url)">{{requirement.name}}
               <fa-icon *ngIf="requirement.done" [icon]="faCheck"></fa-icon>
-              <div *ngIf="!requirement.done && step.url == context.current_step">
-                <input *ngIf="requirement.type == 'checkbox'" type="checkbox" [disabled]="isDisabledSubmitButton(step)" (click)="accomplishRequirement(requirement)"/>
-                <button *ngIf="requirement.type != 'checkbox'" [disabled]="isDisabledSubmitButton(step)" (click)="accomplishRequirement(requirement)">Выполнить</button>
-              </div>
+              <label *ngIf="!requirement.done && step.url == context.current_step">
+                <span><input *ngIf="requirement.type == 'checkbox'"
+                             type="checkbox"
+                             [disabled]="isDisabledSubmitButton(step)"
+                             (click)="accomplishRequirement(requirement)"/></span>
 
+                <span class="input-group" *ngIf="requirement.type != 'checkbox'">
+                  <span><input type="file" [disabled]="isDisabledSubmitButton(step)" [(ngModel)]="file"></span>
+                  <span><input type="checkbox" [disabled]="!file || isDisabledSubmitButton(step)"
+                               (click)="accomplishRequirement(requirement)"/></span>
+                </span>
+              </label>
             </li>
           </ul>
         </td>
         <td>{{this.getUserName(step.executor)}}</td>
         <td>{{this.getUserName(step.manager)}}</td>
+        <td>
+          <span *ngIf="step.status == 1">Выполнено</span>
+          <span *ngIf="step.status == 21">Текущий</span>
+          <span *ngIf="step.status == 20">Текущий</span>
+          <span *ngIf="step.status == 31">В ожидании</span>
+          <span *ngIf="step.status == 30">В ожидании</span>
+        </td>
       </tr>
+      </tbody>
     </table>
   </div>
 </div>
-
-<p><a [routerLink]="['/login']">Logout</a></p>

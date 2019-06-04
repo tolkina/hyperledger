@@ -5,7 +5,7 @@ import {Context} from '../models/context';
 import {Step} from '../models/step';
 import {Requirement} from '../models/requirement';
 import {User} from '../models/user';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import {faCheck} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-home',
@@ -18,6 +18,8 @@ export class HomeComponent implements OnInit {
   steps: Step[] = [];
   requirements: Requirement[] = [];
   faCheck = faCheck;
+  file: any;
+
   constructor(private dataService: DataService) {
   }
 
@@ -26,10 +28,13 @@ export class HomeComponent implements OnInit {
   }
 
   loadData() {
-    this.getUsers();
-    this.getContexts();
-    this.getSteps();
-    this.getRequirements();
+    setTimeout(() => {
+      this.getUsers();
+      this.getContexts();
+      this.getSteps();
+      this.getRequirements();
+    }, 3000);
+
   }
 
   getUsers() {
@@ -38,33 +43,25 @@ export class HomeComponent implements OnInit {
 
   getContexts() {
     this.dataService.getContexts().pipe(first()).subscribe((contexts: Context[]) => {
-      console.log('contexts', contexts);
       this.contexts = contexts;
     });
   }
 
   getSteps() {
     this.dataService.getSteps().pipe(first()).subscribe((steps: Step[]) => {
-      console.log('steps', steps);
       this.steps = steps;
     });
   }
 
   getRequirements() {
     this.dataService.getRequirements().pipe(first()).subscribe((requirements: Requirement[]) => {
-      console.log('requirements', requirements);
       this.requirements = requirements;
     });
   }
 
   startContext(context: Context) {
     console.log('Start context');
-    this.dataService.startContext(context).subscribe(() => this.getContexts());
-  }
-
-  getStepName(current_step: string) {
-    const step = this.getStep(current_step);
-    return step ? step.title : '';
+    this.dataService.startContext(context).subscribe(() => this.loadData());
   }
 
   getStep(current_step: string) {
@@ -105,12 +102,12 @@ export class HomeComponent implements OnInit {
 
     while (step && step.next_step) {
       if (step.url === context.current_step) {
-        step.status = new Date().getTime() > new Date(step.end_date).getTime() ? 21 : 20;
+        step.status = this.isDateMore(step) ? 21 : 20;
         findCurrent = true;
       } else if (!findCurrent) {
         step.status = 1;
       } else {
-        step.status = new Date().getTime() > new Date(step.end_date).getTime() ? 31 : 30;
+        step.status = this.isDateMore(step) ? 31 : 30;
       }
 
       steps.push(step);
@@ -120,8 +117,31 @@ export class HomeComponent implements OnInit {
 
   }
 
+  isDateMore(step: Step) {
+    return step.end_date ? new Date().getTime() > new Date(step.end_date).getTime() : false;
+  }
+
   isDisabledSubmitButton(step: Step) {
     const user = JSON.parse(localStorage.getItem('currentUser')) as User;
     return user ? user.url !== step.executor && user.url !== step.manager : true;
+  }
+
+  getClass(step: Step) {
+    if (step.status === 1) {
+      return 'table-success';
+    }
+    if (step.status === 21) {
+      return 'table-danger';
+    }
+    if (step.status === 20) {
+      return 'table-primary';
+    }
+    if (step.status === 31) {
+      return 'table-warning';
+    }
+    if (step.status === 30) {
+      return 'table-light';
+    }
+    return '';
   }
 }
