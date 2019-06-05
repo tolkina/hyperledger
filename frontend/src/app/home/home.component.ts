@@ -71,7 +71,7 @@ export class HomeComponent implements OnInit {
   getUserName(current_user: string) {
     const user: User = this.users.find(u => u.url === current_user);
     return user
-      ? user.first_name && user.last_name ? user.first_name + ' ' + user.last_name : user.username
+      ? user.first_name ? user.first_name : user.username
       : '';
   }
 
@@ -96,11 +96,13 @@ export class HomeComponent implements OnInit {
   getTable(context: Context): Step[] {
     const steps = [];
     let step = this.getStep(context.initial_step);
-    step.start_date = context.start_date;
+    if (step) {
+      step.start_date = context.start_date;
+    }
 
     let findCurrent = false;
 
-    while (step && step.next_step) {
+    while (step) {
       if (step.url === context.current_step) {
         step.status = this.isDateMore(step) ? 21 : 20;
         findCurrent = true;
